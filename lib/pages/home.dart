@@ -8,16 +8,17 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  dynamic myData;
   Map timeData = {};
   @override
   Widget build(BuildContext context) {
-    myData =  ModalRoute.of(context)?.settings.arguments;
-    print("data from another argument $myData");
-    timeData = myData;
+    
+
+    timeData =  ModalRoute.of(context)!.settings.arguments as Map;
+    print("TIME DATA ${timeData.isNotEmpty}");
+
     String bgImage = timeData['isDayTime'] ? 'day.png' : 'night.png';
     Color? bgColor = timeData['isDayTime'] ? Colors.blue : Colors.indigo[700];
-    print("bgimage $bgImage");
+    //print("bgimage $bgImage");
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -34,8 +35,18 @@ class _HomeState extends State<Home> {
               child: Column(
         children: [
               TextButton.icon(
-                onPressed: () {
-                  Navigator.pushNamed(context, '/location');
+                onPressed: () async {
+                  dynamic result = await Navigator.pushNamed(context, '/location');
+                  print("result got $result");
+                  setState(() {
+                    timeData={
+                      'time': result['time'],
+                      'location': result['location'],
+                      'isDayTime': result['DayTime'],
+                      'flag': result['flag'],
+                    };
+
+                  });
                 },
                 icon: Icon(Icons.edit_location),
                 label: Text("Edit Location"),
