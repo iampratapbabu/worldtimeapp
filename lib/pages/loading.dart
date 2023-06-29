@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+// import 'package:world_time/pages/home.dart';
 import 'dart:convert';
-
+import 'package:world_time/services/world_time.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class Loading extends StatefulWidget {
   const Loading({Key? key}) : super(key: key);
@@ -12,11 +14,34 @@ class Loading extends StatefulWidget {
 
 class _LoadingState extends State<Loading> {
 
+  String time = "Loading...";
+
+  void setWorldTime()async{
+    WorldTime instance = WorldTime(location: "Berlin", flag: 'germany.png', url: 'Europe/Berlin');
+    await instance.getDataFromApi();
+    //Navigator.pushNamed(context, '/home'); //this will push home on top of loading
+    Navigator.pushReplacementNamed(context, '/home',
+      arguments: {
+      'location':instance.location,
+        'flag':instance.flag,
+        'time':instance.time,
+        'isDayTime':instance.isDayTime,
+      });
+    //this will
+    //remove loading screen from bottom and push home on top
+    print(instance.time);
+    setState(() {
+      time = instance.time;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
     print("init state of choose location");
-    getData();
+    setWorldTime();
+    //getData();
+
   }
 
   void getData () async{
@@ -37,10 +62,17 @@ class _LoadingState extends State<Loading> {
   }
 
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(child: Text("Loading"),),
+      backgroundColor: Colors.blue,
+      body: Center(
+        child: SpinKitRotatingCircle(
+          color: Colors.white,
+          size: 50.0,
+        ),
+      )
     );
   }
 }
